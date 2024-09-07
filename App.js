@@ -15,7 +15,7 @@ export default function App() {
     // If permission is granted, launch the image library
     if (permissions?.granted) {
       // If the user selects an image, set the image state to the selected image
-      let result = ImagePicker.launchImageLibraryAsync()
+      ImagePicker.launchImageLibraryAsync()
         .then((result) => {
           if (!result.canceled) setImage(result.assets[0]);
         })
@@ -26,10 +26,29 @@ export default function App() {
         });
     }
   };
+
+  const takePhoto = async () => {
+    // Request permission to access the camera
+    let permissions = await ImagePicker.requestCameraPermissionsAsync();
+
+    // If permission is granted, launch the camera
+    if (permissions?.granted) {
+      // If the user takes a photo, set the image state to the taken photo
+      ImagePicker.launchCameraAsync()
+        .then((result) => {
+          if (!result.canceled) setImage(result.assets[0]);
+        })
+        // If the user cancels taking a photo, set the image state to null
+        .catch((error) => {
+          console.log(error);
+          setImage(null);
+        });
+    }
+  };
   return (
     <View style={styles.container}>
       <Button title="Pick an image from the library" onPress={pickImage} />
-      <Button title="Take a photo" onPress={() => {}} />
+      <Button title="Take a photo" onPress={takePhoto} />
       {image && (
         <Image
           source={{ uri: image.uri }}
