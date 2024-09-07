@@ -1,6 +1,6 @@
 // Import Core React & React Native Components
 import { useState } from "react";
-import { Button, StyleSheet, View } from "react-native";
+import { Button, StyleSheet, View, Image } from "react-native";
 
 // Import all ImagePicker functions to reference them as a collective object "ImagePicker"
 import * as ImagePicker from "expo-image-picker";
@@ -14,11 +14,16 @@ export default function App() {
 
     // If permission is granted, launch the image library
     if (permissions?.granted) {
-      let result = ImagePicker.launchImageLibraryAsync;
       // If the user selects an image, set the image state to the selected image
-      if (!result.canceled) setImage(result.assets[0]);
-      // If the user cancels selection, set the image state to null
-      else setImage(null);
+      let result = ImagePicker.launchImageLibraryAsync()
+        .then((result) => {
+          if (!result.canceled) setImage(result.assets[0]);
+        })
+        // If the user cancels selection, set the image state to null
+        .catch((error) => {
+          console.log(error);
+          setImage(null);
+        });
     }
   };
   return (
