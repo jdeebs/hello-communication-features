@@ -2,8 +2,9 @@
 import { useState } from "react";
 import { Button, StyleSheet, View, Image } from "react-native";
 
-// Import all ImagePicker functions to reference them as a collective object "ImagePicker"
+// Import All Expo Module functions To Reference As Collective Objects
 import * as ImagePicker from "expo-image-picker";
+import * as MediaLibrary from "expo-media-library";
 
 export default function App() {
   const [image, setImage] = useState(null);
@@ -33,18 +34,24 @@ export default function App() {
 
     // If permission is granted, launch the camera
     if (permissions?.granted) {
+      let result = await ImagePicker.launchCameraAsync();
+
       // If the user takes a photo, set the image state to the taken photo
-      ImagePicker.launchCameraAsync()
-        .then((result) => {
-          if (!result.canceled) setImage(result.assets[0]);
-        })
+      if (!result.canceled) {
+        let mediaLibraryPermissions =
+          await MediaLibrary.requestPermissionsAsync();
+
+        // Save the photo to the media library
+        if (mediaLibraryPermissions?.granted)
+          await MediaLibrary.saveToLibraryAsync(result.assets[0].uri);
+
+        // Set the image state to the taken photo
+        setImage(result.assets[0]);
         // If the user cancels taking a photo, set the image state to null
-        .catch((error) => {
-          console.log(error);
-          setImage(null);
-        });
+      } else setImage(null);
     }
   };
+
   return (
     <View style={styles.container}>
       <Button title="Pick an image from the library" onPress={pickImage} />
