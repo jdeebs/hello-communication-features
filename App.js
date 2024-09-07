@@ -1,5 +1,7 @@
-import { StatusBar } from "expo-status-bar";
-import { Button, StyleSheet, Text, View } from "react-native";
+// Import Core React & React Native Components
+import { useState } from "react";
+import { Button, StyleSheet, View } from "react-native";
+
 // Import all ImagePicker functions to reference them as a collective object "ImagePicker"
 import * as ImagePicker from "expo-image-picker";
 
