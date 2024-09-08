@@ -1,13 +1,16 @@
 // Import Core React & React Native Components
 import { useState } from "react";
 import { Button, StyleSheet, View, Image } from "react-native";
+import MapView from "react-native-maps";
 
 // Import All Expo Module functions To Reference As Collective Objects
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
+import * as Location from "expo-location";
 
 export default function App() {
   const [image, setImage] = useState(null);
+  const [location, setLocation] = useState(null);
 
   const pickImage = async () => {
     // Request permission to access the media library
@@ -52,14 +55,46 @@ export default function App() {
     }
   };
 
+  const getLocation = async () => {
+    // Request permission to access the location
+    let permissions = await Location.requestForegroundPermissionsAsync();
+
+    // If permission is granted, get the current location
+    if (permissions?.granted) {
+      const location = await Location.getCurrentPositionAsync({});
+      // Set the location state to the current location
+      setLocation(location);
+      // If permission is not granted, alert the user
+    } else {
+      Alert.alert("Location access denied. Please enable location access.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Button title="Pick an image from the library" onPress={pickImage} />
       <Button title="Take a photo" onPress={takePhoto} />
+      <Button title="Get my location" onPress={getLocation} />
       {image && (
         <Image
+          // Set the image source to the selected image
           source={{ uri: image.uri }}
+          // Set the dimensions of the image
           style={{ width: 200, height: 200 }}
+        />
+      )}
+      {location && (
+        <MapView
+          // Set the dimensions of the map view
+          style={{ width: 300, height: 300 }}
+          region={{
+            // Initial region of the map, centered on the user's current location
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            // Delta values control zoom level of the map
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
         />
       )}
     </View>
